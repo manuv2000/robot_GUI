@@ -1,0 +1,32 @@
+{
+    "name": "robot-fastapi-gui",
+    "dockerFile": "Dockerfile",
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "terminal.integrated.shell.linux": "/bin/bash"
+        },
+        "extensions": [
+          "ms-python.python",
+          "ms-iot.vscode-ros"
+        ]
+      }
+    },
+    "runArgs": [
+      "--cap-add=SYS_PTRACE",
+      "--security-opt",
+      "seccomp=unconfined",
+      "--network=host",
+      "--ipc=host",
+      "--privileged",
+      "--name=robot-fastapi-dev"
+    ],
+    "containerEnv": {
+      "DISPLAY": "${localEnv:DISPLAY}",
+      "QT_X11_NO_MITSHM": "1",
+      "ROS_DOMAIN_ID": "40"
+    },
+    "postCreateCommand": "source /opt/ros/humble/setup.bash && pip3 install -r requirements.txt",
+    "workspaceFolder": "/app"
+  }
+  

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Robot GUI</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Robot Controller</h1>
+    <form action="/cmd_vel" method="post">
+      <div class="button-row">
+        <button name="linear_x" value="0.3" type="submit">⬆ Forward</button>
+        <button name="linear_x" value="-0.3" type="submit">⬇ Backward</button>
+        <button name="angular_z" value="0.5" type="submit">⬅ Turn Left</button>
+        <button name="angular_z" value="-0.5" type="submit">➡ Turn Right</button>
+      </div>
+    </form>
+
+    {% if message %}
+      <p class="status"><strong>Status:</strong> {{ message }}</p>
+    {% endif %}
+
+    <h2>Odometry</h2>
+    <pre id="odom-data">Waiting for odometry...</pre>
+  </div>
+
+  <script>
+    async function fetchOdom() {
+      try {
+        const response = await fetch("/odom");
+        const data = await response.json();
+        document.getElementById("odom-data").textContent = JSON.stringify(data.odom || data, null, 2);
+      } catch (e) {
+        document.getElementById("odom-data").textContent = "Could not fetch odometry.";
+      }
+    }
+    setInterval(fetchOdom, 1000);
+  </script>
+</body>
+</html>

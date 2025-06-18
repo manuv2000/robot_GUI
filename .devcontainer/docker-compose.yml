@@ -1,0 +1,46 @@
+version: "3.8"
+
+networks:
+  rosnet:
+    driver: bridge
+
+services:
+  sim:
+    build:
+      context: /home/pawel/robot40/robot40human_ws
+      dockerfile: .devcontainer/Dockerfile
+    container_name: robot40-ros2-dev
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - ROS_DOMAIN_ID=40
+    volumes:
+      - ${HOME}/.ssh:/root/.ssh
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /home/pawel/robot40/robot40human_ws:/robot40human_ws:cached
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+    ipc: host
+    privileged: true
+    networks:
+      - rosnet
+    command: tail -f /dev/null
+
+  ffastapi:
+    build:
+      context: /home/pawel/python_uni_projects/robot_interface
+      dockerfile: .devcontainer/Dockerfile
+
+    container_name: robot-fastapi
+    environment:
+      - ROS_DOMAIN_ID=40
+    networks:
+      - rosnet
+    ports:
+      - "8000:8000"
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash && uvicorn main:app --host 0.0.0.0 --port 8000"
+
+
